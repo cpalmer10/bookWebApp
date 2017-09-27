@@ -47,7 +47,6 @@ public class AuthorDao {
             author.setAuthorName(rec.get("author_name").toString());
             author.setDateAdded((Date)rec.get("date_added"));
             
-            
         }
         return list;
     }

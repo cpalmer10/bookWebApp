@@ -31,8 +31,7 @@ public class MySqlDataAccess implements DataAccess {
         setPassword(password);
     }
  
-    public MySqlDataAccess(){
-        
+    public MySqlDataAccess(){        
     }
     
     @Override

@@ -31,6 +31,10 @@ public class MySqlDataAccess implements DataAccess {
         setPassword(password);
     }
  
+    public MySqlDataAccess(){
+        
+    }
+    
     @Override
     public final void openConnection() throws ClassNotFoundException, SQLException{
         Class.forName (driverClass);

@@ -45,13 +45,14 @@ public class AuthorDao {
             author = new Author();
             author.setAuthorId(Integer.parseInt(rec.get("author_id").toString()));
             author.setAuthorName(rec.get("author_name").toString());
-            author.setDateAdded(rec.get("date_added").)
+            author.setDateAdded((Date)rec.get("date_added"));
             
             
         }
-        
+        return list;
     }
 
+    
     public List<Author> getAuthorList(String tableName) throws IllegalArgumentException, ClassNotFoundException, SQLException, Exception {
         
         List<Author> authorList = new ArrayList<>();
@@ -118,7 +119,7 @@ public class AuthorDao {
     
     
     public static void main(String[] args) throws ClassNotFoundException, SQLException, Exception {
-        new AuthorDao new MySqlDataAccess("com.mysql.jdbc.Driver","jdbc:mysql://localhost:3306/book", "root","admin");
+        AuthorDao dao = new AuthorDao(new MySqlDataAccess(),"com.mysql.jdbc.Driver","jdbc:mysql://localhost:3306/book", "root","admin");
         
         List<Author> authors = dao.getAuthorList("author");
         

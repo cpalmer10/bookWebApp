@@ -16,15 +16,13 @@ import java.util.Map;
 public interface DataAccess {
 
     public abstract void closeConnection() throws SQLException;
-    public abstract List<Map<String, Object>> findAll(String tableName, int maxRecords) throws ClassNotFoundException, SQLException;
-    public abstract String getDriverClass();
-    public abstract String getPassword();
-    public abstract String getUrl();
-    public abstract String getUserName();
-    public abstract void openConnection() throws ClassNotFoundException, SQLException;
-    public abstract void setDriverClass(String driverClass);
-    public abstract void setPassword(String password);
-    public abstract void setUrl(String url);
-    public abstract void setUserName(String userName);
+    public abstract void openConnection(String driverClassName, String url, String username, String password) throws IllegalArgumentException, ClassNotFoundException, SQLException;
+    public abstract List<Map<String,Object>> findRecordsFor(String tableName, int maxRecords) throws SQLException;
+    public abstract List<Map<String,Object>> findAll(String tableName) throws SQLException;
+    public abstract List findRecords(String sqlString) throws SQLException, Exception;
+    public abstract Map getRecordByID(String table, String primaryKeyField, Object keyValue) throws SQLException, Exception;
+    public abstract boolean insertRecord(String tableName, List<String> columnNames, List columnValues) throws SQLException, Exception;
+    public int updateRecords(String tableName, List<String> columnNames, List columnValues, String whereField, Object whereValue) throws SQLException, Exception;
+    public abstract int deleteRecords(String tableName, String whereField, Object whereValue) throws SQLException, Exception;
     
 }

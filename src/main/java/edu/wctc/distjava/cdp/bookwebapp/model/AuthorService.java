@@ -5,6 +5,7 @@
  */
 package edu.wctc.distjava.cdp.bookwebapp.model;
 
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -14,15 +15,34 @@ import java.util.List;
  * @author Palmer
  */
 public class AuthorService {
+    private AuthorDaoInterface dao;
 
-    public List<Author> getAllAuthors() {
-        return Arrays.asList(
-                new Author(1,"Chris Palmer",new Date()),
-                new Author(2,"Will Boyer",new Date()),               
-                new Author(3,"Joshua Strait",new Date()),
-                new Author(4,"Carson Schultz",new Date()),
-                new Author(5,"Chris Roller",new Date())
-        );
+    public AuthorService(AuthorDaoInterface dao) {
+        this.dao = dao;
+    }
+                                   
+    public List<Author> getAllAuthors(String tableName) throws Exception {
+        return dao.getAuthorList(tableName);        
     }
     
+     public void updateAuthor(String authorName, Integer authorID) throws ClassNotFoundException, SQLException, Exception {
+      dao.updateAuthor(authorName, authorID);
+    }
+    
+    public void deleteAuthor(Integer authorID) throws ClassNotFoundException, Exception {
+        dao.deleteAuthor(authorID);
+    }
+    
+    public void addAuthor(String name) throws Exception {
+        dao.insertAuthor(name);        
+    }
+    
+    
+    public AuthorDaoInterface getDao() {
+        return dao;
+    }
+
+    public void setDao(AuthorDaoInterface dao) {
+        this.dao = dao;
+    }    
 }

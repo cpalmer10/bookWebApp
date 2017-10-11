@@ -5,7 +5,9 @@
  */
 package edu.wctc.distjava.cdp.bookwebapp.controller;
 
+import edu.wctc.distjava.cdp.bookwebapp.dbaccessor.MySqlDataAccess;
 import edu.wctc.distjava.cdp.bookwebapp.model.Author;
+import edu.wctc.distjava.cdp.bookwebapp.model.AuthorDao;
 import edu.wctc.distjava.cdp.bookwebapp.model.AuthorService;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -26,38 +28,71 @@ public class AuthorController extends HttpServlet {
     
     private static final String ERR_MSG = "No parameter detected";
     private static final String LIST_PAGE = "/authorList.jsp";
+    private static final String ADD_PAGE = "/addAuthor.jsp";
+    private static final String UPDATE_PAGE = "/updateAuthor.jsp";
+    private static final String DELETE_PAGE = "/deleteAuthor.jsp";
+    private static final String HOME_PAGE = "/index.jsp";
+    private static final String DELETE_ACTION = "delete";
+    private static final String DELETESHOW_ACTION = "deleteShow";
     private static final String LIST_ACTION = "list";
+    private static final String UPDATE_ACTION = "update";
+    private static final String UPDATESHOW_ACTION = "updateShow";
+    private static final String ADD_ACTION = "add";
+    private static final String ADDSHOW_ACTION = "addShow";
     private static final String ACTION_PARAM = "action";
-
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+  
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         
-        String destination = LIST_PAGE;
-        String action = request.getParameter(ACTION_PARAM);
-        
-        AuthorService authorService = new AuthorService();
-        
-        
+        String destination = HOME_PAGE;
+        String action = request.getParameter(ACTION_PARAM);               
+        AuthorService authorService = new AuthorService(
+                                            new AuthorDao(new MySqlDataAccess(),
+                                                    "com.mysql.jdbc.Driver",
+                                                    "jdbc:mysql://localhost:3306/book", 
+                                                    "root","admin"));                                            
         try {
-           if (action.equals(LIST_ACTION)){
-               List<Author> authors = authorService.getAllAuthors();
-               request.setAttribute("authors", authors);
-               destination = LIST_PAGE;
-           } else {
-               request.setAttribute("errMsg", ERR_MSG);
-           }
-        }
-        catch (Exception e) {
+           switch (action){
+                case LIST_ACTION:
+                    List<Author> authors = authorService.getAllAuthors("author");
+                    request.setAttribute("authors", authors);
+                    destination = LIST_PAGE;
+                    break;
+                case DELETE_ACTION:
+                    Integer authorID = Integer.parseInt(request.getParameter("authorID"));                   
+                    authorService.deleteAuthor(authorID);
+                    destination = HOME_PAGE;
+                    break;
+                case UPDATE_ACTION:
+                    String authorName = request.getParameter("author_name");
+                    Integer authorID2 = Integer.parseInt(request.getParameter("authorID"));
+                        // WTF DO I DO
+                    authorService.updateAuthor(authorName, authorID2);
+                    
+                    destination = HOME_PAGE;
+                    break;                
+                case ADD_ACTION:                    
+                    String name = request.getParameter("author_name");                   
+                    authorService.addAuthor(name);
+                    destination = HOME_PAGE;                    
+                    break;
+                case ADDSHOW_ACTION:
+                    destination = ADD_PAGE;
+                    break;
+                case UPDATESHOW_ACTION:   
+                    List<Author> authorUpdate = authorService.getAllAuthors("author");
+                    request.setAttribute("authorUpdate", authorUpdate);
+                    destination = UPDATE_PAGE;
+                    break;
+                case DELETESHOW_ACTION:
+                    List<Author> authorDelete = authorService.getAllAuthors("author");
+                    request.setAttribute("authorDelete", authorDelete);
+                    destination = DELETE_PAGE;
+                    break;
+                
+                          
+           }                                       
+        } catch (Exception e) {
             request.setAttribute("errMsg", e.getCause().getMessage());
         }
         
@@ -106,3 +141,4 @@ public class AuthorController extends HttpServlet {
     }// </editor-fold>
 
 }
+

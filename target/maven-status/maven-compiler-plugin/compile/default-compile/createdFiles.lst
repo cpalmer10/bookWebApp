@@ -1,0 +1,8 @@
+edu\wctc\distjava\cdp\bookwebapp\constants\ExceptionConstants.class
+edu\wctc\distjava\cdp\bookwebapp\model\Author.class
+edu\wctc\distjava\cdp\bookwebapp\model\AuthorDaoInterface.class
+edu\wctc\distjava\cdp\bookwebapp\dbaccessor\DataAccess.class
+edu\wctc\distjava\cdp\bookwebapp\model\AuthorService.class
+edu\wctc\distjava\cdp\bookwebapp\controller\AuthorController.class
+edu\wctc\distjava\cdp\bookwebapp\model\AuthorDao.class
+edu\wctc\distjava\cdp\bookwebapp\dbaccessor\MySqlDataAccess.class

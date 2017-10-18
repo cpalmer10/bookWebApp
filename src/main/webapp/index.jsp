@@ -12,6 +12,7 @@
         <title>Book Web App</title>
     </head>
     <body>
+        <jsp:include page="header.jsp" />
         <h1>Pick an Administrative Task</h1>
         <ol>
             <li><a href="AuthorController?action=list">View all Authors</a></li>

@@ -13,7 +13,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <link rel="stylesheet" type="text/css" href="bookWebAppCSS.css" media="screen" />
+        <link rel="stylesheet" type="text/css" href="css/bookWebAppCSS.css" media="screen" />
         <title>Author List</title>
     </head>
     <body>        

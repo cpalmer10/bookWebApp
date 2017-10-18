@@ -20,6 +20,6 @@
             <li><a href="AuthorController?action=addShow">Add Author</a></li>
             <li><a href="AuthorController?action=deleteShow">Delete Author</a></li>                       
         </ol>
-        
+        <jsp:include page="footer.jsp" />
     </body>
 </html>

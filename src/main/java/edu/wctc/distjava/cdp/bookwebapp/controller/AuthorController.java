@@ -5,12 +5,16 @@
  */
 package edu.wctc.distjava.cdp.bookwebapp.controller;
 
-import edu.wctc.distjava.cdp.bookwebapp.dbaccessor.MySqlDataAccess;
+import edu.wctc.distjava.cdp.bookwebapp.model.DBAccess.MySqlDataAccess;
 import edu.wctc.distjava.cdp.bookwebapp.model.Author;
-import edu.wctc.distjava.cdp.bookwebapp.model.AuthorDao;
 import edu.wctc.distjava.cdp.bookwebapp.model.AuthorService;
+import edu.wctc.distjava.cdp.bookwebapp.model.DAO.AuthorDAO;
 import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -24,96 +28,67 @@ import javax.servlet.http.HttpServletResponse;
  */
 @WebServlet(name = "AuthorController", urlPatterns = {"/AuthorController"})
 public class AuthorController extends HttpServlet {
-
-    private String driverClass;
-    private String url;
-    private String username;
-    private String password;
-
-    private static final String ERR_MSG = "No parameter detected";
-    private static final String LIST_PAGE = "/authorList.jsp";
-    private static final String ADD_PAGE = "/addAuthor.jsp";
-    private static final String UPDATE_PAGE = "/updateAuthor.jsp";
-    private static final String DELETE_PAGE = "/deleteAuthor.jsp";
-    private static final String HOME_PAGE = "/index.jsp";
-    private static final String DELETE_ACTION = "delete";
-    private static final String DELETESHOW_ACTION = "deleteShow";
-    private static final String LIST_ACTION = "list";
-    private static final String UPDATE_ACTION = "update";
-    private static final String UPDATESHOW_ACTION = "updateShow";
-    private static final String ADD_ACTION = "add";
-    private static final String ADDSHOW_ACTION = "addShow";
-    private static final String ACTION_PARAM = "action";
-
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+      
+    private static String RESULT_PAGE = "/index.jsp";
+    private static String AUTHOR_LIST_PAGE = "/authorList.jsp";
+    private static String ERROR_PAGE = "/error.jsp";
+    private static String LIST_ACTION = "authorList";
+    private static String EDIT = "edit";
+    private static String DELETE = "delete";
+    private static String ACTION = "action";
+    private static String ERROR_MESSAGE = "errorMessage";
+    private static String DELETION = "deletionMessage";
+    private static String DELETION_MESSAGE = "Record successfully deleted";
+    private static String ADD = "add";
+    private static String AUTHORS = "authors";
+    private static String AUTHOR_NAME = "author_name";
+    private static String AUTHOR_ID = "author_id";
+    private static String AUTHOR_DATE = "author_date";
+    
+    private String driverClass;// = "com.mysql.jdbc.Driver";
+    private String url;// = "jdbc:mysql://localhost:3306/bookWebApp";
+    private String username;// = "root";
+    private String password;// ="admin";
+    /**
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
+     * methods.
+     *
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-
-        String destination = HOME_PAGE;
-        String action = request.getParameter(ACTION_PARAM);
-        AuthorService authorService = new AuthorService(
-                new AuthorDao(new MySqlDataAccess(), driverClass, url, username, password));
-        try {
-            switch (action) {
-                case LIST_ACTION:
-                    List<Author> authors = authorService.getAllAuthors("author");
-                    request.setAttribute("authors", authors);
-                    destination = LIST_PAGE;
-                    break;
-                case DELETE_ACTION:
-                    Integer authorID = Integer.parseInt(request.getParameter("authorID"));
-                    authorService.deleteAuthor(authorID);
-                    destination = HOME_PAGE;
-                    break;
-                case UPDATE_ACTION:
-                    String authorName = request.getParameter("author_name");
-                    Integer authorID2 = Integer.parseInt(request.getParameter("authorID"));
-                    // WTF DO I DO
-                    authorService.updateAuthor(authorName, authorID2);
-
-                    destination = HOME_PAGE;
-                    break;
-                case ADD_ACTION:
-                    String name = request.getParameter("author_name");
-                    authorService.addAuthor(name);
-                    destination = HOME_PAGE;
-                    break;
-                case ADDSHOW_ACTION:
-                    destination = ADD_PAGE;
-                    break;
-                case UPDATESHOW_ACTION:
-                    List<Author> authorUpdate = authorService.getAllAuthors("author");
-                    request.setAttribute("authorUpdate", authorUpdate);
-                    destination = UPDATE_PAGE;
-                    break;
-                case DELETESHOW_ACTION:
-                    List<Author> authorDelete = authorService.getAllAuthors("author");
-                    request.setAttribute("authorDelete", authorDelete);
-                    destination = DELETE_PAGE;
-                    break;
-
+        
+        AuthorService as = new AuthorService(new
+        AuthorDAO(driverClass,url,username, password, 
+            new MySqlDataAccess()));
+        
+        try{
+            String action = request.getParameter(ACTION);
+            if(action.equalsIgnoreCase(LIST_ACTION)){
+                getAuthorListPage(request,response, as);
+            }else if(action.equalsIgnoreCase(EDIT)){
+                editAuthor(request,response, as);
+            }else if(action.equalsIgnoreCase(DELETE)){
+                deleteAuthor(request,response, as);
+            }else if(action.equalsIgnoreCase(ADD)){
+                addAuthor(request, response, as);            
+            }else{
+                RESULT_PAGE = AUTHOR_LIST_PAGE;
+                request.setAttribute(AUTHORS, refreshAuthorList(as));
             }
-        } catch (Exception e) {
-            request.setAttribute("errMsg", e.getCause().getMessage());
+        }catch(ClassNotFoundException | SQLException ex){
+            RESULT_PAGE = ERROR_PAGE;
+            request.setAttribute(ERROR_MESSAGE, ex.getMessage());
         }
-
-        RequestDispatcher dispatcher
-                = getServletContext().getRequestDispatcher(destination);
-        dispatcher.forward(request, response);
+        RequestDispatcher view = request.getRequestDispatcher(RESULT_PAGE);
+        view.forward(request, response);
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    @Override
-    public void init() throws ServletException {
-        driverClass = getServletContext()
-                .getInitParameter("db.driver.class");
-        url = getServletContext()
-                .getInitParameter("db.url");
-        username = getServletContext()
-                .getInitParameter("db.username");
-        password = getServletContext()
-                .getInitParameter("db.password");
-    }
-
     /**
      * Handles the HTTP <code>GET</code> method.
      *
@@ -151,5 +126,101 @@ public class AuthorController extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
+
+    /**Returns the author list page
+     * 
+     * @param request
+     * @param response 
+     */
+    private void getAuthorListPage(HttpServletRequest request,HttpServletResponse response, AuthorService as){
+        try {
+            RESULT_PAGE = AUTHOR_LIST_PAGE;
+            request.setAttribute(AUTHORS, as.getAuthorList());
+            
+        } catch (SQLException | ClassNotFoundException ex) {
+            request.setAttribute(ERROR_MESSAGE, ex.getCause());
+        }
+    }
+   
+    /**Edits the author
+     * 
+     * @param request
+     * @param response 
+     */
+    private void editAuthor(HttpServletRequest request, HttpServletResponse response, AuthorService as) {
+        try{
+            int authorId = Integer.parseInt(request.getParameter("id"));
+            Author authorToEdit = as.getAuthorById(authorId);
+            if(authorToEdit != null){
+                Map<String,Object> authorValues = new HashMap<>();
+                authorValues.put(AUTHOR_NAME, request.getParameter("addAuthorName"));
+                authorValues.put(AUTHOR_ID, request.getParameter("id"));
+                as.updateAuthor(authorValues);   
+            }
+            RESULT_PAGE = AUTHOR_LIST_PAGE;
+            request.setAttribute(AUTHORS, refreshAuthorList(as));
+        }catch(ClassNotFoundException | NumberFormatException | SQLException ex){
+            RESULT_PAGE = ERROR_PAGE;
+            request.setAttribute(ERROR_MESSAGE, ex.getCause());
+        }
+    }
+    
+    /**Deletes the author by id
+     * 
+     * @param request
+     * @param response 
+     */
+    private void deleteAuthor(HttpServletRequest request, HttpServletResponse response, AuthorService as){
+        try{
+            int recordsDeleted = as.deleteAuthor(Integer.parseInt(request.getParameter("id")));
+            RESULT_PAGE = AUTHOR_LIST_PAGE;
+            request.setAttribute(DELETION , DELETION_MESSAGE);
+            request.setAttribute(AUTHORS, refreshAuthorList(as));
+        }catch(ClassNotFoundException | NumberFormatException | SQLException ex){
+            RESULT_PAGE = ERROR_PAGE;
+            request.setAttribute(ERROR_MESSAGE, ex.getCause());
+        }
+    }
+    
+    /**Adds a new author
+     * 
+     * @param request
+     * @param response 
+     */
+    private void addAuthor(HttpServletRequest request, HttpServletResponse response, AuthorService as){
+        try{             
+            Map<String,Object> authorValues = new HashMap<>();
+            authorValues.put(AUTHOR_NAME, request.getParameter("addAuthorName"));
+            authorValues.put(AUTHOR_DATE, new Date());
+            as.addAuthor(authorValues);
+            RESULT_PAGE = AUTHOR_LIST_PAGE;
+            request.setAttribute(AUTHORS, refreshAuthorList(as));
+        }catch(ClassNotFoundException | SQLException ex){
+            RESULT_PAGE = ERROR_PAGE;
+           request.setAttribute(ERROR_MESSAGE, ex.getCause()); 
+        }
+    }
+   
+    /**Refreshes the author list after CRUD Operations
+     * 
+     * @return
+     * @throws SQLException
+     * @throws ClassNotFoundException 
+     */
+    private List<Author> refreshAuthorList(AuthorService as) throws SQLException, ClassNotFoundException{
+        return as.getAuthorList();
+    }
+    
+    @Override
+    public void init() throws ServletException {
+        driverClass = getServletContext()
+                .getInitParameter("db.driver.class");
+        url = getServletContext()
+                .getInitParameter("db.url");
+        username = getServletContext()
+                .getInitParameter("db.username");
+        password = getServletContext()
+                .getInitParameter("db.password");
+    }
 
 }

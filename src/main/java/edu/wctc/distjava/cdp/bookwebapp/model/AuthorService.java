@@ -5,44 +5,102 @@
  */
 package edu.wctc.distjava.cdp.bookwebapp.model;
 
+import edu.wctc.distjava.cdp.bookwebapp.model.DAO.AuthorDAO;
+import edu.wctc.distjava.cdp.bookwebapp.model.DAO.IAuthorDAO;
+import edu.wctc.distjava.cdp.bookwebapp.model.DBAccess.IDataAccess;
+import edu.wctc.distjava.cdp.bookwebapp.model.DBAccess.MySqlDataAccess;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
- * @author Palmer
+ * @author chris.roller
  */
 public class AuthorService {
-    private AuthorDaoInterface dao;
+    IAuthorDAO adao;
+    
+    
+    public AuthorService(IAuthorDAO adao){
+        setAdao(adao);
+    }
+    
+    public final IAuthorDAO getAdao() {
+        return adao;
+    }
+    
+    public final void setAdao(IAuthorDAO adao) {
+        if(adao != null){
+            this.adao = adao;            
+        }
+    }
+    /**Gets  a list of authors
+     * 
+     * @return
+     * @throws SQLException
+     * @throws ClassNotFoundException 
+     */
+    public final List<Author> getAuthorList() throws SQLException, ClassNotFoundException{
+        return adao.getListOfAuthors();
+    }
+/**
+ * Returns a single author by ID
+ * @param id
+ * @return
+ * @throws SQLException
+ * @throws ClassNotFoundException 
+ */
+    public final Author getAuthorById(int id) throws SQLException, ClassNotFoundException{
+        return adao.getAuthorById(id);
+    }
+    /**
+     * Deletes an author by id
+     * @param id
+     * @return
+     * @throws SQLException
+     * @throws ClassNotFoundException 
+     */
+    public final int deleteAuthor(int id) throws SQLException, ClassNotFoundException{
+        return adao.deleteAuthorById(id);
+    }
+    /**
+     * Adds a new author
+     * @param newAuthor
+     * @throws SQLException
+     * @throws ClassNotFoundException 
+     */
+    public final void addAuthor(Map<String,Object> newAuthor) throws SQLException, ClassNotFoundException{
 
-    public AuthorService(AuthorDaoInterface dao) {
-        this.dao = dao;
-    }
-                                   
-    public List<Author> getAllAuthors(String tableName) throws Exception {
-        return dao.getAuthorList(tableName);        
+        adao.addNewAuthor(newAuthor);
     }
     
-     public void updateAuthor(String authorName, Integer authorID) throws ClassNotFoundException, SQLException, Exception {
-      dao.updateAuthor(authorName, authorID);
-    }
-    
-    public void deleteAuthor(Integer authorID) throws ClassNotFoundException, Exception {
-        dao.deleteAuthor(authorID);
-    }
-    
-    public void addAuthor(String name) throws Exception {
-        dao.insertAuthor(name);        
-    }
-    
-    
-    public AuthorDaoInterface getDao() {
-        return dao;
-    }
 
-    public void setDao(AuthorDaoInterface dao) {
-        this.dao = dao;
-    }    
+    /**
+     * Updates an author 
+     * @param updatedAuthor
+     * @return
+     * @throws SQLException
+     * @throws ClassNotFoundException 
+     */
+    public final int updateAuthor(Map<String,Object> author) throws SQLException, ClassNotFoundException{
+        return adao.updateAuthorById(author);
+    }
+    /**
+     * Class level testing method
+     * @param args
+     * @throws SQLException
+     * @throws ClassNotFoundException 
+     */
+    public static void main(String[] args) throws SQLException, ClassNotFoundException {
+        IDataAccess db = new MySqlDataAccess("com.mysql.jdbc.Driver", "jdbc:mysql://localhost:3306/bookWebApp", "root", "admin");
+        AuthorDAO adao = new AuthorDAO("com.mysql.jdbc.Driver", "jdbc:mysql://localhost:3306/bookWebApp", "root", "admin", db);
+        AuthorService as = new AuthorService(adao);
+                Map<String,Object> author = new HashMap<String,Object>();
+        author.put("author_name", "Hello 7");
+        author.put("author_id", 20);
+        as.updateAuthor(author);
+    }
+    
+    
 }

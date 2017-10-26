@@ -16,33 +16,21 @@ import java.util.Map;
  */
 public interface IDataAccess {
 
-    void openConnection() throws SQLException, ClassNotFoundException;
-    void closeConnection() throws SQLException;
-
-    List<Map<String, Object>> getAllRecords(String tableName, int maxRecords) throws SQLException, ClassNotFoundException;
-
-    Map<String,Object> getRecordById(String tableName, String columnName, int id) throws SQLException, ClassNotFoundException;
+    public abstract void openConnection() throws SQLException, ClassNotFoundException;
+    public abstract void closeConnection() throws SQLException;
+    public abstract List<Map<String, Object>> getAllRecords(String tableName, int maxRecords) throws SQLException, ClassNotFoundException;   
+    public abstract Map<String,Object> getRecordById(String tableName, String columnName, int id) throws SQLException, ClassNotFoundException;  
+    public abstract int deleteRecordById(String tableName, String columnName, Object id)throws SQLException, ClassNotFoundException;    
+    public abstract int updateRecord(String tableName, ArrayList<String> columnNames, ArrayList<Object> values, String identifierColumnName, Object identifierValue )throws SQLException, ClassNotFoundException;    
+    public abstract void insertNewRecord(String tableName, ArrayList<String> columnNames, ArrayList<Object> values) throws SQLException, ClassNotFoundException;
     
-    int deleteRecordById(String tableName, String columnName, Object id)throws SQLException, ClassNotFoundException;
-    
-    int updateRecord(String tableName, ArrayList<String> columnNames, ArrayList<Object> values, String identifierColumnName, Object identifierValue )throws SQLException, ClassNotFoundException;
-    
-    void insertNewRecord(String tableName, ArrayList<String> columnNames, ArrayList<Object> values) throws SQLException, ClassNotFoundException;
-    
-    String getDriverClass();
-
-    String getPassword();
-
-    String getUrl();
-
-    String getUserName();
-
-    void setDriverClass(String driverClass);
-
-    void setPassword(String password);
-
-    void setUrl(String url);
-
-    void setUserName(String userName);
+    public abstract String getDriverClass();
+    public abstract String getPassword();
+    public abstract String getUrl();
+    public abstract String getUserName();
+    public abstract void setDriverClass(String driverClass);
+    public abstract void setPassword(String password);
+    public abstract void setUrl(String url);
+    public abstract void setUserName(String userName);
     
 }

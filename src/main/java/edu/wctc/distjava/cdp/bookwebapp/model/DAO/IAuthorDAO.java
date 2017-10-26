@@ -18,34 +18,22 @@ import java.util.Map;
  */
 public interface IAuthorDAO {
 
-    Author getAuthorById(int id) throws SQLException, ClassNotFoundException;
+    public abstract Author getAuthorById(int id) throws SQLException, ClassNotFoundException;
+    public abstract List<Author> getListOfAuthors() throws SQLException, ClassNotFoundException;    
+    public abstract int deleteAuthorById(Integer id) throws SQLException, ClassNotFoundException;    
+    public abstract int updateAuthorById(Map<String,Object> author) throws SQLException, ClassNotFoundException;   
+    public abstract void addNewAuthor(Map<String,Object> author) throws SQLException, ClassNotFoundException;
+   
+    public abstract String getPassword();
+    public abstract String getUrl();
+    public abstract String getUserName();
+    public abstract void setDb(IDataAccess db);
+    public abstract void setDriverClass(String driverClass);
+    public abstract void setPassword(String password);
+    public abstract void setUrl(String url);
+    public abstract void setUserName(String userName);
+    public abstract IDataAccess getDb();
+    public abstract String getDriverClass();
 
-    IDataAccess getDb();
-
-    String getDriverClass();
-
-    List<Author> getListOfAuthors() throws SQLException, ClassNotFoundException;
-    
-    int deleteAuthorById(Integer id) throws SQLException, ClassNotFoundException;
-    
-    int updateAuthorById(Map<String,Object> author) throws SQLException, ClassNotFoundException;
-    
-    void addNewAuthor(Map<String,Object> author) throws SQLException, ClassNotFoundException;
-    
-    String getPassword();
-
-    String getUrl();
-
-    String getUserName();
-
-    void setDb(IDataAccess db);
-
-    void setDriverClass(String driverClass);
-
-    void setPassword(String password);
-
-    void setUrl(String url);
-
-    void setUserName(String userName);
     
 }

@@ -5,7 +5,6 @@
  */
 package edu.wctc.distjava.cdp.bookwebapp.model.DBAccess;
 
-import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -14,11 +13,9 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.Vector;
 
@@ -84,7 +81,8 @@ public class MySqlDataAccess implements IDataAccess {
     public final void setPassword(String password) {
         this.password = password;
     }
-
+    
+    
     public MySqlDataAccess(String driverClass, String url, String userName, String password) {
         setDriverClass(driverClass);
         setUrl(url);
@@ -261,29 +259,4 @@ public class MySqlDataAccess implements IDataAccess {
             closeConnection();
         }
     }
-
-    public final static void main(String[] args) throws SQLException, ClassNotFoundException {
-        MySqlDataAccess dbObject = new MySqlDataAccess(
-                "com.mysql.jdbc.Driver",
-                "jdbc:mysql://localhost:3306/bookWebApp",
-                "root",
-                "admin");
-        ArrayList<String> cols = new ArrayList<>();
-        cols.add("author_date");
-        cols.add("author_name");
-        ArrayList<Object> values = new ArrayList<>();
-        values.add("2017-08-09");
-        values.add("Joseph Heller 9");
-
-        //dbObject.deleteRecordById("authors", "author_id", new Integer(10));
-        Map<String, Object> authorObject = dbObject.getRecordById("authors", "author_id", 7);
-        //int updatedRecords = dbObject.updateRecord("authors", cols,values, "author_id", new Integer(6));
-        dbObject.deleteRecordById("authors", "author_id", new Integer(9));
-        //int updatedRecords = dbObject.updateRecord("authors", cols,values, "author_id", new Integer(9));
-        //Map<String, Object> record = dbObject.getRecordById("authors", "author_id", 1);
-        //dbObject.insertNewRecord("authors", cols, values);
-        System.out.println(authorObject);
-
-    }
-
 }

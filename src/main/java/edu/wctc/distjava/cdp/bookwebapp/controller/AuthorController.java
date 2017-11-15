@@ -5,16 +5,15 @@
  */
 package edu.wctc.distjava.cdp.bookwebapp.controller;
 
-import edu.wctc.distjava.cdp.bookwebapp.model.DBAccess.MySqlDataAccess;
 import edu.wctc.distjava.cdp.bookwebapp.model.Author;
 import edu.wctc.distjava.cdp.bookwebapp.model.AuthorService;
-import edu.wctc.distjava.cdp.bookwebapp.model.DAO.AuthorDAO;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.ejb.EJB;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -24,11 +23,13 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  *
- * @author Palmer
+ * @author chris.roller
  */
-@WebServlet(name = "AuthorController", urlPatterns = {"/AuthorController"})
+@WebServlet(name = "AuthorController", urlPatterns = {"/authorController"})
 public class AuthorController extends HttpServlet {
-      
+    
+    @EJB
+    private AuthorService as;
     private static String RESULT_PAGE = "/index.jsp";
     private static final String AUTHOR_LIST_PAGE = "/authorList.jsp";
     private static final String ERROR_PAGE = "/error.jsp";
@@ -45,10 +46,6 @@ public class AuthorController extends HttpServlet {
     private static final String AUTHOR_ID = "author_id";
     private static final String AUTHOR_DATE = "author_date";
     
-    private String driverClass;// = "com.mysql.jdbc.Driver";
-    private String url;// = "jdbc:mysql://localhost:3306/bookWebApp";
-    private String username;// = "root";
-    private String password;// ="admin";
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -61,10 +58,6 @@ public class AuthorController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        
-        AuthorService as = new AuthorService(new
-        AuthorDAO(driverClass,url,username, password, 
-            new MySqlDataAccess()));
         
         try{
             String action = request.getParameter(ACTION);
@@ -153,7 +146,8 @@ public class AuthorController extends HttpServlet {
             Author authorToEdit = as.getAuthorById(authorId);
             if(authorToEdit != null){
                 Map<String,Object> authorValues = new HashMap<>();
-                authorValues.put(AUTHOR_NAME, request.getParameter("addAuthorName"));
+                String authorNameParam = "authorName_" + authorToEdit.getAuthorId();
+                authorValues.put(AUTHOR_NAME, request.getParameter(authorNameParam));
                 authorValues.put(AUTHOR_ID, request.getParameter("id"));
                 as.updateAuthor(authorValues);   
             }
@@ -172,7 +166,7 @@ public class AuthorController extends HttpServlet {
      */
     private void deleteAuthor(HttpServletRequest request, HttpServletResponse response, AuthorService as){
         try{
-            int recordsDeleted = as.deleteAuthor(Integer.parseInt(request.getParameter("id")));
+            //int recordsDeleted = as.deleteAuthor(Integer.parseInt(request.getParameter("id")));
             RESULT_PAGE = AUTHOR_LIST_PAGE;
             request.setAttribute(DELETION , DELETION_MESSAGE);
             request.setAttribute(AUTHORS, refreshAuthorList(as));
@@ -210,17 +204,4 @@ public class AuthorController extends HttpServlet {
     private List<Author> refreshAuthorList(AuthorService as) throws SQLException, ClassNotFoundException{
         return as.getAuthorList();
     }
-    
-    @Override
-    public void init() throws ServletException {
-        driverClass = getServletContext()
-                .getInitParameter("db.driver.class");
-        url = getServletContext()
-                .getInitParameter("db.url");
-        username = getServletContext()
-                .getInitParameter("db.username");
-        password = getServletContext()
-                .getInitParameter("db.password");
-    }
-
 }

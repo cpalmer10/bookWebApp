@@ -5,14 +5,11 @@
  */
 package edu.wctc.distjava.cdp.bookwebapp.controller;
 
-import edu.wctc.distjava.cdp.bookwebapp.model.Author;
-import edu.wctc.distjava.cdp.bookwebapp.model.AuthorService;
+import edu.wctc.distjava.cdp.bookwebapp.entity.Author;
+import edu.wctc.distjava.cdp.bookwebapp.service.AuthorService;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.ejb.EJB;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -21,15 +18,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/**
- *
- * @author chris.roller
- */
 @WebServlet(name = "AuthorController", urlPatterns = {"/authorController"})
 public class AuthorController extends HttpServlet {
     
-    @EJB
-    private AuthorService as;
     private static String RESULT_PAGE = "/index.jsp";
     private static final String AUTHOR_LIST_PAGE = "/authorList.jsp";
     private static final String ERROR_PAGE = "/error.jsp";
@@ -64,7 +55,7 @@ public class AuthorController extends HttpServlet {
             if(action.equalsIgnoreCase(LIST_ACTION)){
                 getAuthorListPage(request,response, as);
             }else if(action.equalsIgnoreCase(EDIT)){
-                editAuthor(request,response, as);
+                updateAuthor(request,response, as);
             }else if(action.equalsIgnoreCase(DELETE)){
                 deleteAuthor(request,response, as);
             }else if(action.equalsIgnoreCase(ADD)){
@@ -125,32 +116,25 @@ public class AuthorController extends HttpServlet {
      * @param request
      * @param response 
      */
-    private void getAuthorListPage(HttpServletRequest request,HttpServletResponse response, AuthorService as){
-        try {
+    private void getAuthorListPage(HttpServletRequest request,HttpServletResponse response, AuthorService as) {
+        try{
             RESULT_PAGE = AUTHOR_LIST_PAGE;
-            request.setAttribute(AUTHORS, as.getAuthorList());
-            
-        } catch (SQLException | ClassNotFoundException ex) {
+            request.setAttribute(AUTHORS, refreshAuthorList(as));
+        }catch(ClassNotFoundException | SQLException ex){
+            RESULT_PAGE = ERROR_PAGE;
             request.setAttribute(ERROR_MESSAGE, ex.getCause());
-        }
+        }       
     }
    
-    /**Edits the author
+    /**update the author
      * 
      * @param request
      * @param response 
      */
-    private void editAuthor(HttpServletRequest request, HttpServletResponse response, AuthorService as) {
-        try{
-            int authorId = Integer.parseInt(request.getParameter("id"));
-            Author authorToEdit = as.getAuthorById(authorId);
-            if(authorToEdit != null){
-                Map<String,Object> authorValues = new HashMap<>();
-                String authorNameParam = "authorName_" + authorToEdit.getAuthorId();
-                authorValues.put(AUTHOR_NAME, request.getParameter(authorNameParam));
-                authorValues.put(AUTHOR_ID, request.getParameter("id"));
-                as.updateAuthor(authorValues);   
-            }
+    private void updateAuthor(HttpServletRequest request, HttpServletResponse response, AuthorService as) {
+        try{            
+            String authorName = request.getParameter("updateAuthorName");            
+            as.updateById(request.getParameter("author_id"), authorName);
             RESULT_PAGE = AUTHOR_LIST_PAGE;
             request.setAttribute(AUTHORS, refreshAuthorList(as));
         }catch(ClassNotFoundException | NumberFormatException | SQLException ex){
@@ -166,7 +150,8 @@ public class AuthorController extends HttpServlet {
      */
     private void deleteAuthor(HttpServletRequest request, HttpServletResponse response, AuthorService as){
         try{
-            //int recordsDeleted = as.deleteAuthor(Integer.parseInt(request.getParameter("id")));
+            String authorId = request.getParameter("id");
+            as.deleteById(authorId);                      
             RESULT_PAGE = AUTHOR_LIST_PAGE;
             request.setAttribute(DELETION , DELETION_MESSAGE);
             request.setAttribute(AUTHORS, refreshAuthorList(as));
@@ -183,10 +168,8 @@ public class AuthorController extends HttpServlet {
      */
     private void addAuthor(HttpServletRequest request, HttpServletResponse response, AuthorService as){
         try{             
-            Map<String,Object> authorValues = new HashMap<>();
-            authorValues.put(AUTHOR_NAME, request.getParameter("addAuthorName"));
-            authorValues.put(AUTHOR_DATE, new Date());
-            as.addAuthor(authorValues);
+            String authorName = request.getParameter("addAuthorName");
+            as.add(authorName);
             RESULT_PAGE = AUTHOR_LIST_PAGE;
             request.setAttribute(AUTHORS, refreshAuthorList(as));
         }catch(ClassNotFoundException | SQLException ex){
@@ -202,6 +185,6 @@ public class AuthorController extends HttpServlet {
      * @throws ClassNotFoundException 
      */
     private List<Author> refreshAuthorList(AuthorService as) throws SQLException, ClassNotFoundException{
-        return as.getAuthorList();
+        return as.findAll();
     }
 }

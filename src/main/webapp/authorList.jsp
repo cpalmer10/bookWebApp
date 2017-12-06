@@ -12,7 +12,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">        
     <jsp:include page="resources/partialPages/scripts.jsp"></jsp:include>
-
         <title>Our Authors</title>
     </head>
     <body>
@@ -79,7 +78,7 @@
                                                 <form class="form" action="AuthorController?action=edit&id=${author.authorId}" method="POST">
                                                     <div class="form-group">
                                                         <label for="authorName" >Author Name: </label>
-                                                        <input type="text" value="${author.authorName}" class="form-control" name="authorName_${author.authorId}" id="authorName_${author.authorId}">
+                                                        <input type="text" value="${author.authorName}" class="form-control" name="updateAuthorName" id="updateAuthorName">
                                                     </div>
                                                     <button type="submit" class="btn btn-primary">Submit Changes</button>
                                                 </form>

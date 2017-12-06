@@ -3,10 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package edu.wctc.distjava.cdp.bookwebapp.model;
+package edu.wctc.distjava.cdp.bookwebapp.entity;
 
 import java.io.Serializable;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -22,7 +23,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
- * @author Chris
+ * @author Palmer
  */
 @Entity
 @Table(name = "book")
@@ -47,8 +48,8 @@ public class Book implements Serializable {
     @Column(name = "isbn")
     private String isbn;
     @JoinColumn(name = "author_id", referencedColumnName = "author_id")
-    @ManyToOne
-    private Author authorId;
+    @ManyToOne(cascade = CascadeType.MERGE)
+    private Author authorEntity;
 
     public Book() {
     }
@@ -81,12 +82,12 @@ public class Book implements Serializable {
         this.isbn = isbn;
     }
 
-    public Author getAuthorId() {
-        return authorId;
+    public Author getAuthorEntity() {
+        return authorEntity;
     }
 
-    public void setAuthorId(Author authorId) {
-        this.authorId = authorId;
+    public void setAuthorEntity(Author authorEntity) {
+        this.authorEntity = authorEntity;
     }
 
     @Override
@@ -111,7 +112,7 @@ public class Book implements Serializable {
 
     @Override
     public String toString() {
-        return "edu.wctc.distjava.cdp.bookwebapp.model.Book[ bookId=" + bookId + " ]";
+        return "edu.wctc.cdp.bookwebapp.model.Book[ bookId=" + bookId + " ]";
     }
     
 }

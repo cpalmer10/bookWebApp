@@ -92,4 +92,14 @@ public class AuthorService {
     public Author edit(Author author) {
         return authorRepo.saveAndFlush(author);
     }
+    
+    @Transactional
+    public void deleteById(String id){
+        int aId = new Integer(id);
+        authorRepo.delete(aId);
+    }
+    
+    public void create(Author a){
+        authorRepo.save(a);
+    }
 }

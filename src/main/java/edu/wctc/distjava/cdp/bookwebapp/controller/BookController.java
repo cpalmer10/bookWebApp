@@ -5,104 +5,95 @@
  */
 package edu.wctc.distjava.cdp.bookwebapp.controller;
 
-
-import edu.wctc.distjava.cdp.bookwebapp.entity.Author;
 import edu.wctc.distjava.cdp.bookwebapp.entity.Book;
+import edu.wctc.distjava.cdp.bookwebapp.service.BookService;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  *
- * @author Palmer
+ * @author chris.roller
  */
-@WebServlet(name = "BookController", urlPatterns = {"/BookController"})
-public class BookController extends HttpServlet {   
+@WebServlet(name = "BookController", urlPatterns = {"/book"})
+public class BookController extends HttpServlet {
+
+    private BookService bs;
+    private static String RESULT_PAGE = "/index.jsp";
+    private static final String BOOK_LIST_PAGE = "/bookList.jsp";
+    private static final String ERROR_PAGE = "/error.jsp";
+    private static final String LIST_ACTION = "bookList";
+    private static final String EDIT = "edit";
+    private static final String DELETE = "delete";
+    private static final String ACTION = "action";
+    private static final String ERROR_MESSAGE = "errorMessage";
+    private static final String DELETION = "deletionMessage";
+    private static final String DELETION_MESSAGE = "Record successfully deleted";
+    private static final String ADD = "add";
+    private static final String BOOKS = "books";
+    private static final String BOOK_NAME = "book_name";
+    private static final String BOOK_ID = "book_id";
+    private static final String BOOK_PUBLISH_DATE = "book_publish_date";
     
-    private static final String ERR_MSG = "No parameter detected";
-    private static final String LIST_PAGE = "/bookList.jsp";
-    private static final String ADD_PAGE = "/addBook.jsp";
-    private static final String UPDATE_PAGE = "/updateBook.jsp";
-    private static final String DELETE_PAGE = "/deleteBook.jsp";
-    private static final String HOME_PAGE = "/index.jsp";
-    private static final String DELETE_ACTION = "delete";
-    private static final String DELETESHOW_ACTION = "deleteShow";
-    private static final String LIST_ACTION = "list";
-    private static final String UPDATE_ACTION = "update";
-    private static final String UPDATESHOW_ACTION = "updateShow";
-    private static final String ADD_ACTION = "add";
-    private static final String ADDSHOW_ACTION = "addShow";
-    private static final String ACTION_PARAM = "action";
     
-  
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    
+ @Override
+    public void init() throws ServletException {
+            // Ask Spring for object to inject
+        ServletContext sctx = getServletContext();
+        WebApplicationContext ctx
+         = WebApplicationContextUtils
+         .getWebApplicationContext(sctx);
+        bs = (BookService) ctx.getBean("bookService");
+}
+    
+    
+    /**
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
+     * methods.
+     *
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */ 
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        
-        String destination = HOME_PAGE;
-        String action = request.getParameter(ACTION_PARAM);  
-                                                                                           
-        try {           
-           switch (action){
-                case LIST_ACTION:
-                    List<Book> books = bookService.findAll();
-                    request.setAttribute("books", books);
-                    destination = LIST_PAGE;
-                    break;
-                case DELETE_ACTION:                                      
-                    bookService.deleteById(request.getParameter("bookID"));
-                    destination = HOME_PAGE;
-                    break;
-                case UPDATE_ACTION:
-                    String isbn = request.getParameter("isbn");
-                    String bookTitle = request.getParameter("title");                    
-                    String authorId = request.getParameter("authorId");
-                        
-                    bookService.update(request.getParameter("bookId"), bookTitle, isbn, authorId);
-                    
-                    destination = HOME_PAGE;
-                    break;                
-                case ADD_ACTION:                    
-                    String title = request.getParameter("title");
-                    String bookIsbn = request.getParameter("isbn");                    
-                    
-                    bookService.addNew(title, bookIsbn);
-                    destination = HOME_PAGE;                    
-                    break;
-                case ADDSHOW_ACTION:
-                    List<Author> authors = authorService.findAll();
-                    request.setAttribute("authors", authors);                    
-                    destination = ADD_PAGE;
-                    break;
-                case UPDATESHOW_ACTION:   
-                    List<Book> bookUpdate = bookService.findAll();
-                    request.setAttribute("bookUpdate", bookUpdate);                                       
-                    destination = UPDATE_PAGE;
-                    break;
-                case DELETESHOW_ACTION:
-                    List<Book> bookDelete = bookService.findAll();
-                    request.setAttribute("bookDelete", bookDelete);
-                    destination = DELETE_PAGE;
-                    break;
-                
-                          
-           }                                       
-        } catch (Exception e) {
-            request.setAttribute("errMsg", e.getCause().getMessage());
+                try{
+            String action = request.getParameter(ACTION);
+            if(action.equalsIgnoreCase(LIST_ACTION)){
+                getBookListPage(request,response);
+//            }else if(action.equalsIgnoreCase(EDIT)){
+//                editAuthor(request,response);
+//            }else if(action.equalsIgnoreCase(DELETE)){
+//                deleteAuthor(request,response);
+//            }else if(action.equalsIgnoreCase(ADD)){
+//                addAuthor(request, response);            
+            }else{
+                RESULT_PAGE = BOOK_LIST_PAGE;
+                request.setAttribute(BOOKS, refreshBookList());
+            }
+        }catch(ClassNotFoundException | SQLException ex){
+            RESULT_PAGE = ERROR_PAGE;
+            request.setAttribute(ERROR_MESSAGE, ex.getMessage());
         }
-        
-        RequestDispatcher dispatcher
-                = getServletContext().getRequestDispatcher(destination);
-        dispatcher.forward(request, response);
-    }
+        RequestDispatcher view = request.getRequestDispatcher(RESULT_PAGE);
+        view.forward(request, response);
+        }
     
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
      *
@@ -141,4 +132,24 @@ public class BookController extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
+       
+    /**Returns the author list page
+     * 
+     * @param request
+     * @param response 
+     */
+    private void getBookListPage(HttpServletRequest request,HttpServletResponse response){
+        RESULT_PAGE = BOOK_LIST_PAGE;
+        request.setAttribute(BOOKS, bs.findAll());
+    }
+    
+        /**Refreshes the author list after CRUD Operations
+     * 
+     * @return
+     * @throws SQLException
+     * @throws ClassNotFoundException 
+     */
+    private List<Book> refreshBookList() throws SQLException, ClassNotFoundException{
+        return bs.findAll();
+    }
 }

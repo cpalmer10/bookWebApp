@@ -1,3 +1,8 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package edu.wctc.distjava.cdp.bookwebapp.entity;
 
 import java.io.Serializable;
@@ -22,7 +27,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
- * @author Chris
+ * @author chris.roller
  */
 @Entity
 @Table(name = "author")
@@ -31,27 +36,28 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Author.findAll", query = "SELECT a FROM Author a")
     , @NamedQuery(name = "Author.findByAuthorId", query = "SELECT a FROM Author a WHERE a.authorId = :authorId")
     , @NamedQuery(name = "Author.findByAuthorName", query = "SELECT a FROM Author a WHERE a.authorName = :authorName")
-    , @NamedQuery(name = "Author.findByDateAdded", query = "SELECT a FROM Author a WHERE a.dateAdded = :dateAdded")})
+    , @NamedQuery(name = "Author.findByAuthorDate", query = "SELECT a FROM Author a WHERE a.authorDate = :authorDate")})
 public class Author implements Serializable {
+
     private static final long serialVersionUID = 1L;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "author_id")
     private Integer authorId;
-    @Size(max = 50)
+    @Size(max = 45)
     @Column(name = "author_name")
     private String authorName;
-    @Column(name = "date_added")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date dateAdded;
-    @OneToMany(mappedBy = "authorEntity", cascade = CascadeType.ALL)
+    @Column(name = "author_date")
+    @Temporal(TemporalType.DATE)
+    private Date authorDate;
+    @OneToMany(mappedBy = "author",cascade = CascadeType.ALL)
     private Set<Book> bookSet;
 
     public Author() {
     }
 
-    
     public Author(Integer authorId) {
         this.authorId = authorId;
     }
@@ -72,14 +78,14 @@ public class Author implements Serializable {
         this.authorName = authorName;
     }
 
-    public Date getDateAdded() {
-        return dateAdded;
+    public Date getAuthorDate() {
+        return authorDate;
     }
 
-    public void setDateAdded(Date dateAdded) {
-        this.dateAdded = dateAdded;
+    public void setAuthorDate(Date authorDate) {
+        this.authorDate = authorDate;
     }
-    
+
     @XmlTransient
     public Set<Book> getBookSet() {
         return bookSet;
@@ -88,7 +94,6 @@ public class Author implements Serializable {
     public void setBookSet(Set<Book> bookSet) {
         this.bookSet = bookSet;
     }
-    
 
     @Override
     public int hashCode() {
@@ -112,7 +117,7 @@ public class Author implements Serializable {
 
     @Override
     public String toString() {
-        return "edu.wctc.cdp.bookwebapp.model.Author[ authorId=" + authorId + " ]";
+        return "edu.wctc.car.bookwebapp.model.Author[ authorId=" + authorId + " ]";
     }
-
+    
 }

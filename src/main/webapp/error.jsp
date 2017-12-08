@@ -1,13 +1,14 @@
 <%-- 
     Document   : error
     Created on : Sep 19, 2017, 9:03:12 PM
-    Author     : chris.roller
+    Author     : Chris Palmer
 --%>
-
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+
 <!DOCTYPE html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">

@@ -10,10 +10,10 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="description" content="">
-        <meta name="author" content="Jim Lombardo">
+        <meta name="author" content="Chris Palmer">
 
         <title>Spring Security Login Page</title>
-        <link rel="stylesheet" href="css/styles.css" /> 
+        <link rel="stylesheet" href="resources/css/main.css" /> 
     </head>
 
     <body>

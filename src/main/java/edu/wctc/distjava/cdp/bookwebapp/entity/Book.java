@@ -112,7 +112,7 @@ public class Book implements Serializable {
 
     @Override
     public String toString() {
-        return "edu.wctc.cdp.bookwebapp.model.Book[ bookId=" + bookId + " ]";
+        return "edu.wctc.distjava.cdp.bookwebapp.model.Book[ bookId=" + bookId + " ]";
     }
     
 }

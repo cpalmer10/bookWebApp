@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>edu.wctc.web.demo</groupId>
+    <groupId>edu.wctc.distjava.cdp</groupId>
     <artifactId>bookWebApp</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
@@ -23,6 +23,20 @@
             we are using Hibernate. You will also see that we need to add
             libraries for JSTL because JSTL is not in Tomcat either.
         -->
+<!--
+        <dependency>
+            <groupId>org.eclipse.persistence</groupId>
+            <artifactId>eclipselink</artifactId>
+            <version>2.5.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.persistence</groupId>
+            <artifactId>org.eclipse.persistence.jpa.modelgen.processor</artifactId>
+            <version>2.5.2</version>
+            <scope>provided</scope>
+        </dependency>
+-->
         <dependency>
             <groupId>org.hibernate.javax.persistence</groupId>
             <artifactId>hibernate-jpa-2.1-api</artifactId>
@@ -32,8 +46,7 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
-            <version>4.3.10.Final</version>
-            <scope>runtime</scope>
+            <version>4.3.1.Final</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -59,6 +72,12 @@
             <groupId>javax.persistence</groupId>
             <artifactId>persistence-api</artifactId>
             <version>1.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>unknown.binary</groupId>
+            <artifactId>hibernate-jpamodelgen-4.3.1.Final</artifactId>
+            <version>SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javax</groupId>
@@ -353,5 +372,11 @@
             </plugin>
         </plugins>
     </build>
-
+    <repositories>
+        <repository>
+            <id>unknown-jars-temp-repo</id>
+            <name>A temporary repository created by NetBeans for libraries and jars it could not identify. Please replace the dependencies in this repository with correct ones and delete this repository.</name>
+            <url>file:${project.basedir}/lib</url>
+        </repository>
+    </repositories>
 </project>

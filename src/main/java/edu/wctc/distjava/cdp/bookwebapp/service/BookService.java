@@ -4,7 +4,6 @@ import edu.wctc.distjava.cdp.bookwebapp.entity.Book;
 import edu.wctc.distjava.cdp.bookwebapp.repository.AuthorRepository;
 import edu.wctc.distjava.cdp.bookwebapp.repository.BookRepository;
 import java.util.List;
-import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,21 +28,21 @@ import org.springframework.transaction.annotation.Transactional;
 public class BookService {
     private transient final Logger LOG = LoggerFactory.getLogger(BookService.class);
     
-    @Inject
-    private BookRepository bookRepo;
+    @Autowired
+    private BookRepository bookRepository;
     
-    @Inject
-    private AuthorRepository authorRepo;
+    @Autowired
+    private AuthorRepository authorRepository;
 
     public BookService() {
     }
     
     public List<Book> findAll() {
-        return bookRepo.findAll();
+        return bookRepository.findAll();
     }
     
     public Book findById(String id) {
-        return bookRepo.findOne(new Integer(id));
+        return bookRepository.findOne(new Integer(id));
     }
     
     /**
@@ -54,7 +53,7 @@ public class BookService {
     @Transactional
     public void remove(Book book) {
         LOG.debug("Deleting book: " + book.getTitle());
-        bookRepo.delete(book);
+        bookRepository.delete(book);
     }
 
     /**
@@ -64,7 +63,7 @@ public class BookService {
      */
     @Transactional
     public Book edit(Book book) {
-        return bookRepo.saveAndFlush(book);
+        return bookRepository.saveAndFlush(book);
     }
 //    
 //    public List<Book> searchByAuthorId(Integer id) {

@@ -26,12 +26,35 @@
 ">
     
     <!-- Scans within the base package of the application for Spring annotations to configure as beans -->
-    <context:component-scan base-package="edu.wctc.web.demo.bookwebapp">
-        <context:exclude-filter type="regex" expression="edu\.wctc\.web\.demo\.bookwebapp\.repository.*" />
+    <context:component-scan base-package="edu.wctc.distjava.cdp.bookwebapp">
+        <context:exclude-filter type="regex" expression="edu\.wctc\.distjava\.cdp\.bookwebapp\.repository.*" />
     </context:component-scan>
     <context:annotation-config/>
     
-    <jpa:repositories base-package="edu.wctc.web.demo.bookwebapp.repository" />
+    <jpa:repositories base-package="edu.wctc.distjava.cdp.bookwebapp.repository" />
+    
+    <!-- Server managed connection pool accessed via JNDI -->
+    <jee:jndi-lookup id="dataSource" jndi-name="jdbc/book"/>
+  
+    <!-- Spring managed EntityManager configuration -->
+    <bean id="entityManagerFactory"
+          class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="persistenceUnitName" value="book_PU"/>
+        <property name="packagesToScan" value="edu.wctc.distjava.cdp.bookwebapp.entity"/>
+        <property name="dataSource" ref="dataSource" />
+        <property name="jpaVendorAdapter">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+                <property name="showSql" value="false" />
+                <property name="generateDdl" value="false" />
+                <property name="databasePlatform" value="org.hibernate.dialect.MySQL5Dialect"/>
+            </bean>
+        </property>
+    </bean>
+
+    <!-- Spring managed transactions -->
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory" />
+    </bean>
     
     <!-- Begin Spring Security Config -->
       <!-- begin Spring Security config -->
@@ -67,7 +90,7 @@
 	    password-parameter="j_password"
             login-processing-url="/j_spring_security_check"
             login-page="/login.jsp" 
-            default-target-url="/index.html"
+            default-target-url="/index.jsp"
             always-use-default-target="true"
             authentication-failure-url="/loginerror.jsp"/>
             
@@ -102,29 +125,6 @@
         
     <!-- (Optional) Automatically receives and logs AuthenticationEvent messages -->
     <bean id="loggerListener" class="org.springframework.security.authentication.event.LoggerListener"/>
-     
-    <!-- Server managed connection pool accessed via JNDI -->
-    <jee:jndi-lookup id="dataSource" jndi-name="jdbc/book"/>
-  
-    <!-- Spring managed EntityManager configuration -->
-    <bean id="entityManagerFactory"
-          class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
-        <property name="persistenceUnitName" value="book_PU"/>
-        <property name="packagesToScan" value="edu.wctc.web.demo.bookwebapp.entity"/>
-        <property name="dataSource" ref="dataSource" />
-        <property name="jpaVendorAdapter">
-            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
-                <property name="showSql" value="false" />
-                <property name="generateDdl" value="false" />
-                <property name="databasePlatform" value="org.hibernate.dialect.MySQL5Dialect"/>
-            </bean>
-        </property>
-    </bean>
-
-    <!-- Spring managed transactions -->
-    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
-        <property name="entityManagerFactory" ref="entityManagerFactory" />
-    </bean>
 
     <tx:annotation-driven />   
 </beans>

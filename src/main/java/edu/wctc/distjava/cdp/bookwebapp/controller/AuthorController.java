@@ -28,9 +28,9 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  *
  * @author chris.roller
  */
-@WebServlet(name = "AuthorController", urlPatterns = {"/authorController"})
+@WebServlet(name = "AuthorController", urlPatterns = {"/AuthorController"})
 public class AuthorController extends HttpServlet {
-    private AuthorService as;
+    private AuthorService authorService;
     private static String RESULT_PAGE = "/index.jsp";
     private static final String AUTHOR_LIST_PAGE = "/authorList.jsp";
     private static final String ERROR_PAGE = "/error.jsp";
@@ -55,17 +55,7 @@ public class AuthorController extends HttpServlet {
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
-     */
-    
-@Override
-public void init() throws ServletException {
-        // Ask Spring for object to inject
-    ServletContext sctx = getServletContext();
-    WebApplicationContext ctx
-     = WebApplicationContextUtils
-     .getWebApplicationContext(sctx);
-    as = (AuthorService) ctx.getBean("authorService");
-}
+     */  
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -120,6 +110,14 @@ public void init() throws ServletException {
             throws ServletException, IOException {
         processRequest(request, response);
     }
+    
+    @Override
+    public void init() throws ServletException {  
+        // Ask Spring for object to inject
+        ServletContext sctx = getServletContext();
+        WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(sctx);
+        authorService = (AuthorService) ctx.getBean("authorService");
+    }
 
     /**
      * Returns a short description of the servlet.
@@ -138,7 +136,7 @@ public void init() throws ServletException {
      */
     private void getAuthorListPage(HttpServletRequest request,HttpServletResponse response){
         RESULT_PAGE = AUTHOR_LIST_PAGE;
-        request.setAttribute(AUTHORS, as.findAll());
+        request.setAttribute(AUTHORS, authorService.findAll());
     }
    
     /**Edits the author
@@ -153,7 +151,7 @@ public void init() throws ServletException {
             String authorNameParam = "authorName_" + authorId;
             author.setAuthorId(new Integer(authorId));
             author.setAuthorName(request.getParameter(authorNameParam));
-            as.edit(author);   
+            authorService.edit(author);   
            
             RESULT_PAGE = AUTHOR_LIST_PAGE;
             request.setAttribute(AUTHORS, refreshAuthorList());
@@ -170,7 +168,7 @@ public void init() throws ServletException {
      */
     private void deleteAuthor(HttpServletRequest request, HttpServletResponse response){
         try{
-            as.deleteById(request.getParameter("id"));
+            authorService.deleteById(request.getParameter("id"));
             RESULT_PAGE = AUTHOR_LIST_PAGE;
             request.setAttribute(DELETION , DELETION_MESSAGE);
             request.setAttribute(AUTHORS, refreshAuthorList());
@@ -192,8 +190,8 @@ public void init() throws ServletException {
             authorValues.put(AUTHOR_DATE, new Date());
             Author a = new Author();
             a.setAuthorName(request.getParameter("addAuthorName"));
-            a.setAuthorDate(new Date());
-            as.create(a);
+            a.setDateAdded(new Date());
+            authorService.create(a);
             RESULT_PAGE = AUTHOR_LIST_PAGE;
             request.setAttribute(AUTHORS, refreshAuthorList());
         }catch(ClassNotFoundException | SQLException ex){
@@ -209,7 +207,7 @@ public void init() throws ServletException {
      * @throws ClassNotFoundException 
      */
     private List<Author> refreshAuthorList() throws SQLException, ClassNotFoundException{
-        return as.findAll();
+        return authorService.findAll();
     }
     
 }

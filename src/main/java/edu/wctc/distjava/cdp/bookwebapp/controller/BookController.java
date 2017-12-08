@@ -6,6 +6,7 @@
 package edu.wctc.distjava.cdp.bookwebapp.controller;
 
 import edu.wctc.distjava.cdp.bookwebapp.entity.Book;
+import edu.wctc.distjava.cdp.bookwebapp.service.AuthorService;
 import edu.wctc.distjava.cdp.bookwebapp.service.BookService;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -25,10 +26,10 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  *
  * @author chris.roller
  */
-@WebServlet(name = "BookController", urlPatterns = {"/book"})
+@WebServlet(name = "BookController", urlPatterns = {"/BookController"})
 public class BookController extends HttpServlet {
 
-    private BookService bs;
+    private BookService bookService;
     private static String RESULT_PAGE = "/index.jsp";
     private static final String BOOK_LIST_PAGE = "/bookList.jsp";
     private static final String ERROR_PAGE = "/error.jsp";
@@ -46,16 +47,7 @@ public class BookController extends HttpServlet {
     private static final String BOOK_PUBLISH_DATE = "book_publish_date";
     
     
-    
- @Override
-    public void init() throws ServletException {
-            // Ask Spring for object to inject
-        ServletContext sctx = getServletContext();
-        WebApplicationContext ctx
-         = WebApplicationContextUtils
-         .getWebApplicationContext(sctx);
-        bs = (BookService) ctx.getBean("bookService");
-}
+   
     
     
     /**
@@ -121,6 +113,14 @@ public class BookController extends HttpServlet {
             throws ServletException, IOException {
         processRequest(request, response);
     }
+    
+    @Override
+    public void init() throws ServletException {  
+        // Ask Spring for object to inject
+        ServletContext sctx = getServletContext();
+        WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(sctx);
+        bookService = (BookService) ctx.getBean("bookService");
+    }
 
     /**
      * Returns a short description of the servlet.
@@ -140,7 +140,7 @@ public class BookController extends HttpServlet {
      */
     private void getBookListPage(HttpServletRequest request,HttpServletResponse response){
         RESULT_PAGE = BOOK_LIST_PAGE;
-        request.setAttribute(BOOKS, bs.findAll());
+        request.setAttribute(BOOKS, bookService.findAll());
     }
     
         /**Refreshes the author list after CRUD Operations
@@ -150,6 +150,6 @@ public class BookController extends HttpServlet {
      * @throws ClassNotFoundException 
      */
     private List<Book> refreshBookList() throws SQLException, ClassNotFoundException{
-        return bs.findAll();
+        return bookService.findAll();
     }
 }

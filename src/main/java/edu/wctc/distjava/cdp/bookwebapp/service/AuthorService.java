@@ -4,9 +4,9 @@ import edu.wctc.distjava.cdp.bookwebapp.entity.Author;
 import edu.wctc.distjava.cdp.bookwebapp.repository.AuthorRepository;
 import edu.wctc.distjava.cdp.bookwebapp.repository.BookRepository;
 import java.util.List;
-import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,21 +29,21 @@ public class AuthorService {
 
     private transient final Logger LOG = LoggerFactory.getLogger(AuthorService.class);
 
-    @Inject
-    private AuthorRepository authorRepo;
+    @Autowired
+    private AuthorRepository authorRepository;
 
-    @Inject
-    private BookRepository bookRepo;
+    @Autowired
+    private BookRepository bookRepository;
 
     public AuthorService() {
     }
 
     public List<Author> findAll() {
-        return authorRepo.findAll();
+        return authorRepository.findAll();
     }
     
     public List<Author> findAllEagerly() {
-        List<Author> authors = authorRepo.findAll();
+        List<Author> authors = authorRepository.findAll();
         for(Author a : authors) {
             a.getBookSet().size();
         }
@@ -59,7 +59,7 @@ public class AuthorService {
      */
     public Author findByIdAndFetchBooksEagerly(String id) {
         Integer authorId = new Integer(id);
-        Author author = authorRepo.findOne(authorId);
+        Author author = authorRepository.findOne(authorId);
 
         // Eagerly fetches books within a transaction
         author.getBookSet().size();
@@ -68,7 +68,7 @@ public class AuthorService {
     }
 
     public Author findById(String id) {
-        return authorRepo.findOne(new Integer(id));
+        return authorRepository.findOne(new Integer(id));
     }
 
     /**
@@ -79,7 +79,7 @@ public class AuthorService {
     @Transactional
     public void remove(Author author) {
         LOG.debug("Deleting author: " + author.getAuthorName());
-        authorRepo.delete(author);
+        authorRepository.delete(author);
     }
 
     /**
@@ -90,16 +90,16 @@ public class AuthorService {
      */
     @Transactional
     public Author edit(Author author) {
-        return authorRepo.saveAndFlush(author);
+        return authorRepository.saveAndFlush(author);
     }
     
     @Transactional
     public void deleteById(String id){
         int aId = new Integer(id);
-        authorRepo.delete(aId);
+        authorRepository.delete(aId);
     }
     
     public void create(Author a){
-        authorRepo.save(a);
+        authorRepository.save(a);
     }
 }
